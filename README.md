@@ -8,14 +8,14 @@ Thank you to [@pokearaujo](https://github.com/pokearaujo/multidevice) for writin
 
 WaConnector is type-safe, extensible and simple to use. If you require more functionality than provided, it's super easy to write an extension. More on this [here](#WritingCustomFunctionality).
 
-If you're interested in building a WhatsApp bot, you may wanna check out [WhatsAppInfoBot](https://github.com/adiwajshing/WhatsappInfoBot) and an actual bot built with it, [Messcat](https://github.com/ashokatechmin/Messcat).
+If you're interested in building a WhatsApp bot, you may wanna check out [WhatsAppInfoBot](https://github.com/ercsaczap/WhatsappInfoBot) and an actual bot built with it, [Messcat](https://github.com/ashokatechmin/Messcat).
 
-**Read the docs [here](https://adiwajshing.github.io/WaConnector)**
+**Read the docs [here](https://ercsaczap.github.io/WaConnector)**
 **Join the Discord [here](https://discord.gg/WeJM5FP9GG)**
 
 ## Example
 
-Do check out & run [example.ts](https://github.com/adiwajshing/WaConnector/blob/master/Example/example.ts) to see an example usage of the library.
+Do check out & run [example.ts](https://github.com/ercsaczap/WaConnector/blob/master/Example/example.ts) to see an example usage of the library.
 The script covers most common use cases.
 To run the example script, download or clone the repo and then type the following in a terminal:
 
@@ -29,22 +29,22 @@ To run the example script, download or clone the repo and then type the followin
 Use the stable version:
 
 ```
-yarn add @adiwajshing/WaConnector
+yarn add @ercsaczap/wa-connector
 ```
 
 Use the edge version (no guarantee of stability, but latest fixes + features)
 
 ```
-yarn add github:adiwajshing/WaConnector
+yarn add github:ercsaczap/wa-connector
 ```
 
 Then import your code using:
 
 ```ts
 // for multi-device
-import makeWASocket from "@adiwajshing/WaConnector";
+import makeWASocket from "@ercsaczap/wa-connector";
 // for legacy web
-import { makeWALegacySocket } from "@adiwajshing/WaConnector";
+import { makeWALegacySocket } from "@ercsaczap/wa-connector";
 ```
 
 ## Unit Tests
@@ -54,7 +54,7 @@ TODO
 ## Connecting
 
 ```ts
-import makeWASocket, { DisconnectReason } from "@adiwajshing/WaConnector";
+import makeWASocket, { DisconnectReason } from "@ercsaczap/wa-connector";
 import { Boom } from "@hapi/boom";
 
 async function connectToWhatsApp() {
@@ -104,7 +104,7 @@ If the connection is successful, you will see a QR code printed on your terminal
 1. WaConnector has been written from the ground up to have a more "functional" structure. This is done primarily for simplicity & more testability
 2. The WaConnector event emitter will emit all events and be used to generate a source of truth for the connected user's account. Access the event emitter using (`sock.ev`)
 3. WaConnector no longer maintains an internal state of chats/contacts/messages. You should ideally take this on your own, simply because your state in MD is its own source of truth & there is no one-size-fits-all way to handle the storage for this. However, a simple storage extension has been provided. This also serves as a good demonstration of how to use the WaConnector event emitter to construct a source of truth.
-4. A WaConnector "socket" is meant to be a temporary & disposable object -- this is done to maintain simplicity & prevent bugs. I felt the entire WaConnector object became too bloated as it supported too many configurations. You're encouraged to write your own implementation to handle missing functionality.
+4. A wa-connector "socket" is meant to be a temporary & disposable object -- this is done to maintain simplicity & prevent bugs. I felt the entire WaConnector object became too bloated as it supported too many configurations. You're encouraged to write your own implementation to handle missing functionality.
 5. WaConnector does not offer an inbuilt reconnect mechanism anymore (though it's super easy to set one up with your own rules, check the example script)
 
 ## Configuring the Connection
@@ -164,13 +164,13 @@ So, you can load the credentials to log back in:
 import makeWASocket, {
   BufferJSON,
   useMultiFileAuthState,
-} from "@adiwajshing/WaConnector";
+} from "@ercsaczap/wa-connector";
 import * as fs from "fs";
 
 // utility function to help save the auth state in a single folder
 // this function serves as a good guide to help write auth & key states for SQL/no-SQL databases, which I would recommend in any production grade system
 const { state, saveCreds } = await useMultiFileAuthState(
-  "auth_info_WaConnector"
+  "auth_info_wa-connector"
 );
 // will use the given state to connect
 // so if valid credentials are available -- it'll connect without QR
@@ -288,15 +288,15 @@ WaConnector does not come with a defacto storage for chats, contacts, or message
 It can be used as follows:
 
 ```ts
-import makeWASocket, { makeInMemoryStore } from "@adiwajshing/WaConnector";
+import makeWASocket, { makeInMemoryStore } from "@ercsaczap/wa-connector";
 // the store maintains the data of the WA connection in memory
 // can be written out to a file & read from it
 const store = makeInMemoryStore({});
 // can be read from a file
-store.readFromFile("./WaConnector_store.json");
+store.readFromFile("./wa-connector_store.json");
 // saves the state to a file every 10s
 setInterval(() => {
-  store.writeToFile("./WaConnector_store.json");
+  store.writeToFile("./wa-connector_store.json");
 }, 10_000);
 
 const sock = makeWASocket({});
@@ -328,7 +328,7 @@ Example on using the eg. version:
 ```ts
 import P from "pino";
 import { Boom } from "@hapi/boom";
-import { makeWALegacySocket } from "@adiwajshing/WaConnector";
+import { makeWALegacySocket } from "@ercsaczap/wa-connector";
 
 // store can be used with legacy version as well
 const store = makeInMemoryStore({
@@ -348,7 +348,7 @@ If you need a type representing either the legacy or MD version:
 
 ```ts
 // this type can have any of the socket types underneath
-import { AnyWASocket } from "@adiwajshing/WaConnector";
+import { AnyWASocket } from "@ercsaczap/wa-connector";
 ```
 
 ## Sending Messages
@@ -358,11 +358,7 @@ import { AnyWASocket } from "@adiwajshing/WaConnector";
 ### Non-Media Messages
 
 ```ts
-import {
-  MessageType,
-  MessageOptions,
-  Mimetype,
-} from "@adiwajshing/WaConnector";
+import { MessageType, MessageOptions, Mimetype } from "@ercsaczap/wa-connector";
 
 const id = "abcd@s.whatsapp.net"; // the WhatsApp ID
 // send a simple text!
@@ -419,7 +415,7 @@ const templateButtons = [
     index: 1,
     urlButton: {
       displayText: "⭐ Star WaConnector on GitHub!",
-      url: "https://github.com/adiwajshing/WaConnector",
+      url: "https://github.com/ercsaczap/wa-connetor",
     },
   },
   {
@@ -499,7 +495,7 @@ const sendMsg = await sock.sendMessage(id, reactionMessage);
 ```ts
 // send a link
 const sentMsg = await sock.sendMessage(id, {
-  text: "Hi, this was sent using https://github.com/adiwajshing/WaConnector",
+  text: "Hi, this was sent using https://github.com/ercsaczap/wa-connector",
 });
 ```
 
@@ -511,7 +507,7 @@ Sending media (video, stickers, images) is easier & more efficient than ever.
 - When specifying a media url, WaConnector never loads the entire buffer into memory; it even encrypts the media as a readable stream.
 
 ```ts
-import { MessageType, MessageOptions, Mimetype } from '@adiwajshing/WaConnector'
+import { MessageType, MessageOptions, Mimetype } from '@ercsaczap/wa-connector'
 // Sending gifs
 await sock.sendMessage(
     id,
@@ -557,7 +553,7 @@ const sendMsg = await sock.sendMessage(id, buttonMessage)
 
 //send a template message with an image **attached**!
 const templateButtons = [
-  {index: 1, urlButton: {displayText: '⭐ Star WaConnector on GitHub!', url: 'https://github.com/adiwajshing/WaConnector'}},
+  {index: 1, urlButton: {displayText: '⭐ Star WaConnector on GitHub!', url: 'https://github.com/ercsaczap/WaConnector'}},
   {index: 2, callButton: {displayText: 'Call me!', phoneNumber: '+1 (234) 5678-901'}},
   {index: 3, quickReplyButton: {displayText: 'This is a reply, just like normal buttons!', id: 'id-like-buttons-message'}},
 ]
@@ -595,7 +591,7 @@ const sendMsg = await sock.sendMessage(id, templateMessage)
                               */,
     mimetype:
       Mimetype.pdf /* (for media messages) specify the type of media (optional for all media types except documents),
-                                  import {Mimetype} from '@adiwajshing/WaConnector'
+                                  import {Mimetype} from '@ercsaczap/wa-connector'
                               */,
     fileName: "somefile.pdf", // (for media messages) file name for the media
     /* will send audio messages as voice notes, if set to true */
@@ -662,7 +658,7 @@ If you want to save the media you received
 
 ```ts
 import { writeFile } from 'fs/promises'
-import { downloadMediaMessage } from '@adiwajshing/WaConnector'
+import { downloadMediaMessage } from '@ercsaczap/wa-connector'
 
 sock.ev.on('messages.upsert', async ({ messages }) => {
     const m = messages[0]
@@ -678,7 +674,7 @@ sock.ev.on('messages.upsert', async ({ messages }) => {
             { },
             {
                 logger,
-                // pass this so that WaConnector can request a reupload of media
+                // pass this so that wa-connector can request a reupload of media
                 // that has been deleted
                 reuploadRequest: sock.updateMediaMessage
             }
@@ -832,9 +828,9 @@ await sock.sendMessage(jid, { disappearingMessagesInChat: false });
   ```
 - To get a business profile, such as description or category
   `ts
-    const profile = await sock.getBusinessProfile("xyz@s.whatsapp.net")
-    console.log("business description: " + profile.description + ", category: " + profile.category)
-    `
+const profile = await sock.getBusinessProfile("xyz@s.whatsapp.net")
+console.log("business description: " + profile.description + ", category: " + profile.category)
+`
   Of course, replace `xyz` with an actual ID.
 
 ## Groups
